@@ -16,18 +16,18 @@ class Task1(Node):
         # self.c1 = float(input("enter x axis center of outer rectangle : "))
         # self.c2 = float(input("enter y axis center of outer rectangle : "))
         # self.left= self.c1 - (self.w / 2.0)
-        # self.top= self.c2 - (self.h / 2.0)
+        # self.top= self.c2 + (self.h / 2.0)
         # self.right=self.c1+ (self.w / 2.0)
-        # self.down=self.c2 + (self.h / 2.0)
+        # self.down=self.c2 - (self.h / 2.0)
 
         # self.w1 = float(input("enter length of inner rectangle : "))  #this block takes the width and height of inner rectangle   [don't use thsi block some problem here]
         # self.h1 = float(input("enter height of innner rectangle : "))
         # self.c11 = float(input("enter x axis center of inner rectangle : "))
         # self.c21 = float(input("enter y axis center of inner rectangle : "))
         # self.left1= self.c11 - (self.w1 / 2.0)
-        # self.top1= self.c21 - (self.h / 2.0)
+        # self.top1= self.c21 + (self.h / 2.0)
         # self.right1=self.c11+ (self.w1 / 2.0)
-        # self.down1=self.c21 + (self.h1 / 2.0)
+        # self.down1=self.c21 - (self.h1 / 2.0)
 
         self.left= float(input("left : "))
         self.top= float(input("top : "))
@@ -60,40 +60,46 @@ class Task1(Node):
     
     def next_linear_x(self): #next z value for correction
         """return next value of z"""
-        return random.uniform(0.0,5.0)
+        return random.uniform(2.0,5.0)
 
     def next_linear_y(self): #next z value for correction
         """return next value of z"""
-        return random.uniform(0.0,5.0)
+        return random.uniform(2.0,5.0)
+
         
     def next_angular_z(self): #next z value for correction
         """return next value of z"""
-        return random.uniform(0.5,0.9)
+        return 0.0
 
     
     def callback(self , pose:Pose):
         msg = Twist()
         
-        if pose.x > self.right or pose.y > self.down or pose.x < self.left or pose.y < self.top:  #this main if block is for outer rectangle
+        if pose.x > self.right or pose.y > self.top or pose.x < self.left or pose.y < self.down or (pose.x < self.right1 and pose.x > self.left1 and pose.y < self.top1 and pose.y > self.down1):  #this main if block is for outer rectangle
             msg.linear.x=self.next_correction_linear_x()
             msg.linear.y=self.next_correction_linear_y()
             msg.angular.z=self.next_correction_angular_z()
-        
-        else:
-            
-            if pose.x < self.right1 and pose.y < self.down1 and pose.x > self.left1 and pose.y > self.top1:  #this secondary if block is for inner rectangle
-                msg.linear.x=self.next_correction_linear_x()
-                msg.linear.y=self.next_correction_linear_y()
-                msg.angular.z=self.next_correction_angular_z()
+ 
 
-
-            else:            #if inside big rec and outside small recc then this:
-                msg.linear.x=self.next_linear_x()
-                msg.linear.y=self.next_linear_y()
-                msg.angular.z=self.next_angular_z()
+        else:            #if inside big rec and outside small recc then this:
+            msg.linear.x=self.next_linear_x()
+            msg.linear.y=self.next_linear_y()
+            msg.angular.z=self.next_angular_z()
 
 
         self.cmd_vel_publisher_.publish(msg)
+
+
+
+        # Y:
+        # up/top - values increase
+        # down/bottom - values decrease
+
+        # X:
+        # right - values increase
+        # left - values decrease
+
+
 
 
 
