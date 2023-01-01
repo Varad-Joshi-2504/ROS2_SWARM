@@ -47,12 +47,12 @@ class Task1(Node):
     
     def next_correction_linear_x(self): #next x value for correction
         """return the next value of x"""
-        return random.uniform(0.0,0.2)
+        return random.uniform(0.1,0.3)
         
 
     def next_correction_linear_y(self): #next y value for correction
         """return the next value of y"""
-        return random.uniform(0.0,0.2)
+        return random.uniform(0.1,0.3)
 
     def next_correction_angular_z(self): #next z value for correction
         """return next value of z"""
@@ -60,11 +60,11 @@ class Task1(Node):
     
     def next_linear_x(self): #next z value for correction
         """return next value of z"""
-        return random.uniform(2.0,5.0)
+        return random.uniform(3.0,5.0)
 
     def next_linear_y(self): #next z value for correction
         """return next value of z"""
-        return random.uniform(2.0,5.0)
+        return random.uniform(3.0,5.0)
 
         
     def next_angular_z(self): #next z value for correction
