@@ -11,4 +11,4 @@
     3.MOVE around in First rec big , dont enter smaller rec
     4.smaller rec is random placed 
  
- - when running task1.py from package Task run pose_subscriber.py from package my_robot_controller
+
