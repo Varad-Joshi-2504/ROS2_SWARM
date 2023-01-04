@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from turtlesim.msg import Pose
+from geometry_msgs.msg import Twist
 
 class PoseSubscriber(Node):
     def __init__(self):
@@ -10,7 +11,8 @@ class PoseSubscriber(Node):
 
     def pose_callback(self,msg:Pose):
         
-        self.get_logger().info("x : " + str(msg.x)+ " , y : " + str(msg.y))  
+        self.get_logger().info("angular vel : " + str(msg.angular_velocity)+ " , linear vel : " + str(msg.linear_velocity) + " , theta : " + str(msg.theta)) 
+        self.get_logger().info("x: " + str(msg.x)+ " , y : " + str(msg.y) +"\n")
 
         
 
