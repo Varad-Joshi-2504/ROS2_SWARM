@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'python_parameters'
+package_name = 'parameters_learn'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'minimal_param_node = python_parameters.python_parameters_node:main'
+            "parameters_learn = parameters_learn.parameters_learn:main"
         ],
     },
 )

@@ -5,6 +5,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
+from tutorial_interfaces.msg import Num
 import random
 import math
 import argparse
@@ -17,18 +18,6 @@ import argparse
 # right - values increase
 # left - values decrease
 
-left = float(input("left : "))  # outer
-top = float(input("top : "))
-right = float(input("right :"))
-down = float(input("down : "))
-left1 = float(input("left1 : "))  # inner
-top1 = float(input("top1 : "))
-right1 = float(input("right1 : "))
-down1 = float(input("down1 : "))
-print(" outer rec : left : " + str(left) + " right : " + str(right) +
-      " top : " + str(top) + " down : " + str(down) + "\n")
-print(" inner rec : left : " + str(left1) + " right : " + str(right1) +
-      " top : " + str(top1) + " down : " + str(down1))
 # pose_danger_x:0.0
 # pose_danger_y=0.0
 
@@ -43,17 +32,101 @@ class TurtleBoundaryLimiter(Node):
             Pose, '/turtle1/pose', self.callback, 10)
         self.get_logger().info('...')
 
+        self.declare_parameters(
+            'outer_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
+
+        self.out_left_param = self.get_parameter(
+            'outer_rec.left').get_parameter_value().double_value
+        self.out_top_param = self.get_parameter(
+            'outer_rec.top').get_parameter_value().double_value
+        self.out_down_param = self.get_parameter(
+            'outer_rec.down').get_parameter_value().double_value
+        self.out_right_param = self.get_parameter(
+            'outer_rec.right').get_parameter_value().double_value
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.left',
+            rclpy.Parameter.Type.DOUBLE,
+            self.out_left_param
+        )])
+
+        # for top parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.top',
+            rclpy.Parameter.Type.DOUBLE,
+            self.out_top_param
+        )])
+
+        # for down parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.down',
+            rclpy.Parameter.Type.DOUBLE,
+            self.out_down_param
+        )])
+
+        # for right parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.right',
+            rclpy.Parameter.Type.DOUBLE,
+            self.out_right_param
+        )])
+
+        self.declare_parameters(
+            'inner_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
+
+        self.inner_left_param = self.get_parameter(
+            'inner_rec.left').get_parameter_value().double_value
+        self.inner_top_param = self.get_parameter(
+            'inner_rec.top').get_parameter_value().double_value
+        self.inner_down_param = self.get_parameter(
+            'inner_rec.down').get_parameter_value().double_value
+        self.inner_right_param = self.get_parameter(
+            'inner_rec.right').get_parameter_value().double_value
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.left',
+            rclpy.Parameter.Type.DOUBLE,
+            self.inner_left_param
+        )])
+
+        # for top parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.top',
+            rclpy.Parameter.Type.DOUBLE,
+            self.inner_top_param
+        )])
+
+        # for down parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.down',
+            rclpy.Parameter.Type.DOUBLE,
+            self.inner_down_param
+        )])
+
+        # for right parameter
+
+        self.set_parameters([rclpy.Parameter(
+            'outer_rec.right',
+            rclpy.Parameter.Type.DOUBLE,
+            self.inner_right_param
+        )])
+
     def callback(self, pose: Pose):
         msg = Twist()
 
         # this is if block for outer and inner limits
 
-        if pose.x > right or pose.y > top or pose.x < left or pose.y < down or (pose.x < right1 and pose.x > left1 and pose.y < top1 and pose.y > down1):
+        if pose.x > self.out_right_param or pose.y > self.out_top_param or pose.x < self.out_left_param or pose.y < self.out_down_param or (pose.x < self.inner_right_param and pose.x > self.inner_left_param and pose.y < self.inner_top_param and pose.y > self.inner_down_param):
 
             msg.linear.x = next_correction_linear_x()
             msg.linear.y = next_correction_linear_y()
 
-           #if pose.theta >
+           # if pose.theta >
             msg.angular.z = next_correction_angular_z()
             # self.warning = warning_callback()
             # msg.linear.x = next(warning_callback())
@@ -70,7 +143,7 @@ class TurtleBoundaryLimiter(Node):
             # msg.linear.y = next(general_movement())
             # msg.angular.z = next(general_movement())
 
-        print (str(msg.linear)+"    "+str(msg.linear.y)+"    "+str(msg.angular.z))
+        print(str(msg.linear)+"    "+str(msg.linear.y)+"    "+str(msg.angular.z))
 
         self.cmd_vel_publisher_.publish(msg)
 
@@ -134,7 +207,7 @@ def main():
     # print("Turtle ", args.name, " can go at the most ", args.left, " meters to the left")
     rclpy.init()
     node = TurtleBoundaryLimiter()
-    rclpy.spin(node.callback)
+    rclpy.spin(node)
     rclpy.shutdown()
 
 

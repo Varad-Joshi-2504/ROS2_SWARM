@@ -1,0 +1,9 @@
+/minimal_param_node:
+  ros__parameters:
+    outer_rec:
+      down: 0.0
+      left: 0.0
+      right: 0.0
+      top: 0.0
+    use_sim_time: false
+
