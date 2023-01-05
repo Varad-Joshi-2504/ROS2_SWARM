@@ -8,7 +8,6 @@ from turtlesim.msg import Pose
 from tutorial_interfaces.msg import Num
 import random
 import math
-import argparse
 
 # Y:
 # up/top - values increase
@@ -18,8 +17,6 @@ import argparse
 # right - values increase
 # left - values decrease
 
-# pose_danger_x:0.0
-# pose_danger_y=0.0
 
 class TurtleBoundaryLimiter(Node):
 
@@ -30,20 +27,18 @@ class TurtleBoundaryLimiter(Node):
             'outer_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
         self.declare_parameters(
             'inner_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
-        
-        self.outer =[]
-        self.inner=[]
+
+        self.outer = []
+        self.inner = []
 
         self.cmd_vel_publisher_ = self.create_publisher(
             Twist, '/turtle1/cmd_vel', 10)
         self.pose_subscriber_ = self.create_subscription(
-            Pose, '/turtle1/pose', self.callback, 10)
-
-
+            Pose, '/turtle1/pose', self.param_callback, 10)
 
         self.timer = self.create_timer(1, self.param_callback)
 
-    def param_callback(self):
+    def param_callback(self, pose: Pose):
 
         # for outer left paramter
 
@@ -133,18 +128,19 @@ class TurtleBoundaryLimiter(Node):
             inner_right_param
         )])
 
-        self.outer=[out_left_param,out_top_param,out_right_param,out_down_param]
-        self.inner=[inner_left_param,inner_top_param,inner_right_param,inner_down_param]
-
-    def callback(self, pose: Pose):
-        msg = Twist()
-
+        self.outer = [out_left_param, out_top_param,
+                      out_right_param, out_down_param]
+        self.inner = [inner_left_param, inner_top_param,
+                      inner_right_param, inner_down_param]
         self.get_logger().info("outer : "+str(self.outer)[1:-1])
         self.get_logger().info("inner : "+str(self.inner)[1:-1])
 
-        #this is if block for outer and inner limits
+    #def callback(self, pose: Pose):
+        msg = Twist()
 
-        if pose.x > self.outer[2] or pose.y > self.outer[1] or pose.x < self.outer[0] or pose.y < self.outer[3] or (pose.x < self.inner[2]  and pose.y < self.inner[1] and pose.x > self.inner[0] and pose.y > self.inner[3]):
+        # this is if block for outer and inner limits
+
+        if pose.x > self.outer[2] or pose.y > self.outer[1] or pose.x < self.outer[0] or pose.y < self.outer[3] or (pose.x < self.inner[2] and pose.y < self.inner[1] and pose.x > self.inner[0] and pose.y > self.inner[3]):
 
             msg.linear.x = next_correction_linear_x()
             msg.linear.y = next_correction_linear_y()
@@ -217,17 +213,6 @@ def next_angular_z():  # next z value for correction
 
 
 def main():
-    # parser = argparse.ArgumentParser(
-    #     prog = 'turtle-limit',
-    #     description = 'Limit the turtle in its track')
-    # parser.add_argument('-l',
-    #                     '--left',
-    #                     action='store')
-    # parser.add_argument('--name',
-    #                     action='store',
-    #                     help='Name of the turtle')
-    # args = parser.parse_args()
-    # print("Turtle ", args.name, " can go at the most ", args.left, " meters to the left")
     rclpy.init()
     node = TurtleBoundaryLimiter()
     rclpy.spin(node)
