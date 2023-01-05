@@ -21,110 +21,130 @@ import argparse
 # pose_danger_x:0.0
 # pose_danger_y=0.0
 
-
 class TurtleBoundaryLimiter(Node):
 
     def __init__(self):
+
         super().__init__('Turtle_boundary')
+        self.declare_parameters(
+            'outer_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
+        self.declare_parameters(
+            'inner_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
+        
+        self.outer =[]
+        self.inner=[]
+
         self.cmd_vel_publisher_ = self.create_publisher(
             Twist, '/turtle1/cmd_vel', 10)
         self.pose_subscriber_ = self.create_subscription(
             Pose, '/turtle1/pose', self.callback, 10)
-        self.get_logger().info('...')
 
-        self.declare_parameters(
-            'outer_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
 
-        self.out_left_param = self.get_parameter(
+
+        self.timer = self.create_timer(1, self.param_callback)
+
+    def param_callback(self):
+
+        # for outer left paramter
+
+        out_left_param = self.get_parameter(
             'outer_rec.left').get_parameter_value().double_value
-        self.out_top_param = self.get_parameter(
-            'outer_rec.top').get_parameter_value().double_value
-        self.out_down_param = self.get_parameter(
-            'outer_rec.down').get_parameter_value().double_value
-        self.out_right_param = self.get_parameter(
-            'outer_rec.right').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'outer_rec.left',
             rclpy.Parameter.Type.DOUBLE,
-            self.out_left_param
+            out_left_param
         )])
 
-        # for top parameter
+        # for outer top parameter
+
+        out_top_param = self.get_parameter(
+            'outer_rec.top').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'outer_rec.top',
             rclpy.Parameter.Type.DOUBLE,
-            self.out_top_param
+            out_top_param
         )])
 
-        # for down parameter
+        # for outer down parameter
+
+        out_down_param = self.get_parameter(
+            'outer_rec.down').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'outer_rec.down',
             rclpy.Parameter.Type.DOUBLE,
-            self.out_down_param
+            out_down_param
         )])
 
-        # for right parameter
+        # for outer right parameter
+
+        out_right_param = self.get_parameter(
+            'outer_rec.right').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'outer_rec.right',
             rclpy.Parameter.Type.DOUBLE,
-            self.out_right_param
+            out_right_param
         )])
 
-        self.declare_parameters(
-            'inner_rec', [['left', 0.0], ['top', 0.0], ['down', 0.0], ['right', 0.0]])
+        # for inner left parameter
 
-        self.inner_left_param = self.get_parameter(
+        inner_left_param = self.get_parameter(
             'inner_rec.left').get_parameter_value().double_value
-        self.inner_top_param = self.get_parameter(
-            'inner_rec.top').get_parameter_value().double_value
-        self.inner_down_param = self.get_parameter(
-            'inner_rec.down').get_parameter_value().double_value
-        self.inner_right_param = self.get_parameter(
-            'inner_rec.right').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'inner_rec.left',
             rclpy.Parameter.Type.DOUBLE,
-            self.inner_left_param
+            inner_left_param
         )])
 
-        # for top parameter
+        # for inner top parameter
+
+        inner_top_param = self.get_parameter(
+            'inner_rec.top').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'inner_rec.top',
             rclpy.Parameter.Type.DOUBLE,
-            self.inner_top_param
+            inner_top_param
         )])
 
-        # for down parameter
+        # for inner down parameter
+
+        inner_down_param = self.get_parameter(
+            'inner_rec.down').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'inner_rec.down',
             rclpy.Parameter.Type.DOUBLE,
-            self.inner_down_param
+            inner_down_param
         )])
 
-        # for right parameter
+        # for inner right parameter
+
+        inner_right_param = self.get_parameter(
+            'inner_rec.right').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
             'inner_rec.right',
             rclpy.Parameter.Type.DOUBLE,
-            self.inner_right_param
+            inner_right_param
         )])
+
+        self.outer=[out_left_param,out_top_param,out_right_param,out_down_param]
+        self.inner=[inner_left_param,inner_top_param,inner_right_param,inner_down_param]
 
     def callback(self, pose: Pose):
         msg = Twist()
 
-        self.get_logger().info("outer : \n"+str(self.out_down_param)+str(self.out_left_param)+str(self.out_top_param)+str(self.out_right_param))
-        self.get_logger().info("inner : \n"+str(self.inner_down_param)+str(self.inner_left_param)+str(self.inner_top_param)+str(self.inner_right_param))
-       
-        # this is if block for outer and inner limits
+        self.get_logger().info("outer : "+str(self.outer)[1:-1])
+        self.get_logger().info("inner : "+str(self.inner)[1:-1])
 
-        if pose.x > self.out_right_param or pose.y > self.out_top_param or pose.x < self.out_left_param or pose.y < self.out_down_param or (pose.x < self.inner_right_param and pose.x > self.inner_left_param and pose.y < self.inner_top_param and pose.y > self.inner_down_param):
+        #this is if block for outer and inner limits
+
+        if pose.x > self.outer[2] or pose.y > self.outer[1] or pose.x < self.outer[0] or pose.y < self.outer[3] or (pose.x < self.inner[2]  and pose.y < self.inner[1] and pose.x > self.inner[0] and pose.y > self.inner[3]):
 
             msg.linear.x = next_correction_linear_x()
             msg.linear.y = next_correction_linear_y()
