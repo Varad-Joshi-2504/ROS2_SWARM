@@ -87,7 +87,7 @@ class TurtleBoundaryLimiter(Node):
             'inner_rec.right').get_parameter_value().double_value
 
         self.set_parameters([rclpy.Parameter(
-            'outer_rec.left',
+            'inner_rec.left',
             rclpy.Parameter.Type.DOUBLE,
             self.inner_left_param
         )])
@@ -95,7 +95,7 @@ class TurtleBoundaryLimiter(Node):
         # for top parameter
 
         self.set_parameters([rclpy.Parameter(
-            'outer_rec.top',
+            'inner_rec.top',
             rclpy.Parameter.Type.DOUBLE,
             self.inner_top_param
         )])
@@ -103,7 +103,7 @@ class TurtleBoundaryLimiter(Node):
         # for down parameter
 
         self.set_parameters([rclpy.Parameter(
-            'outer_rec.down',
+            'inner_rec.down',
             rclpy.Parameter.Type.DOUBLE,
             self.inner_down_param
         )])
@@ -111,7 +111,7 @@ class TurtleBoundaryLimiter(Node):
         # for right parameter
 
         self.set_parameters([rclpy.Parameter(
-            'outer_rec.right',
+            'inner_rec.right',
             rclpy.Parameter.Type.DOUBLE,
             self.inner_right_param
         )])
@@ -119,6 +119,9 @@ class TurtleBoundaryLimiter(Node):
     def callback(self, pose: Pose):
         msg = Twist()
 
+        self.get_logger().info("outer : \n"+str(self.out_down_param)+str(self.out_left_param)+str(self.out_top_param)+str(self.out_right_param))
+        self.get_logger().info("inner : \n"+str(self.inner_down_param)+str(self.inner_left_param)+str(self.inner_top_param)+str(self.inner_right_param))
+       
         # this is if block for outer and inner limits
 
         if pose.x > self.out_right_param or pose.y > self.out_top_param or pose.x < self.out_left_param or pose.y < self.out_down_param or (pose.x < self.inner_right_param and pose.x > self.inner_left_param and pose.y < self.inner_top_param and pose.y > self.inner_down_param):
