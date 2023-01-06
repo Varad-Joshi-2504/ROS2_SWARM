@@ -36,7 +36,7 @@ class TurtleBoundaryLimiter(Node):
         self.pose_subscriber_ = self.create_subscription(
             Pose, '/turtle1/pose', self.param_callback, 10)
 
-        self.timer = self.create_timer(1, self.param_callback)
+        # self.timer_= self.create_timer(1, self.param_callback)
 
     def param_callback(self, pose: Pose):
 
